@@ -139,6 +139,7 @@ func (s *Stream) start() {
 		msg := ServerMsg{}
 
 		if err := s.conn.ReadJSON(&msg); err == nil {
+			log.Println(msg)
 			handler := s.findHandler(msg.Stream)
 			if handler != nil {
 				msgBytes, _ := json.Marshal(msg.Data)
@@ -147,6 +148,10 @@ func (s *Stream) start() {
 					var tradeupdate TradeUpdate
 					json.Unmarshal(msgBytes, &tradeupdate)
 					handler(tradeupdate)
+				case msg.Stream == AccountUpdates:
+					var accountupdate AccountUpdate
+					json.Unmarshal(msgBytes, &accountupdate)
+					handler(accountupdate)
 				case strings.HasPrefix(msg.Stream, "Q."):
 					var quote StreamQuote
 					json.Unmarshal(msgBytes, &quote)
@@ -288,7 +293,8 @@ func (s *Stream) openSocket() (*websocket.Conn, error) {
 	connectionAttempts := 0
 	for connectionAttempts < MaxConnectionAttempts {
 		connectionAttempts++
-		c, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
+		log.Println(u.String())
+		c, _, err := websocket.DefaultDialer.Dial("wss://paper-api.alpaca.markets/stream", nil)
 		if err == nil {
 			return c, nil
 		}

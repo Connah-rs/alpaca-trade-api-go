@@ -389,6 +389,11 @@ type TradeUpdate struct {
 	Order Order  `json:"order"`
 }
 
+type AccountUpdate struct {
+	Event   string  `json:"event"`
+	Account Account `json:"account"`
+}
+
 type StreamAgg struct {
 	Event             string  `json:"ev"`
 	Symbol            string  `json:"T"`
